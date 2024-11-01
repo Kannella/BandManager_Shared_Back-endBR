@@ -29,7 +29,7 @@ builder.Services.AddSingleton<AppConfiguration>();
 
 var app = builder.Build();
 
-// Obter a string de conex„o
+// Obter a string de conex√£o
 var appConfig = app.Services.GetRequiredService<AppConfiguration>();
 string connectionString = appConfig.GetConnectionString();
 
@@ -38,7 +38,7 @@ using (var connection = new MySqlConnection(connectionString))
     try
     {
         connection.Open();
-        Console.WriteLine("Conex„o bem-sucedida!");
+        Console.WriteLine("Conex√£o bem-sucedida!");
     }
     catch (Exception ex)
     {
@@ -54,6 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseDeveloperExceptionPage();
 
 // Enable CORS
 app.UseCors("AllowAllOrigins");
