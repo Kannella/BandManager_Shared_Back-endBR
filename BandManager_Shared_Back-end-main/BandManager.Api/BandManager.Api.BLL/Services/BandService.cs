@@ -8,5 +8,10 @@ namespace BandManager.Api.BLL.Services
 		public BandService(IDirectDbRepository<Band> repository) : base(repository)
 		{
 		}
-	}
+
+        public void CreateBand(Band band)
+        {
+            Create(band); // Chama o método da classe base para inserir o usuário
+        }
+    }
 }

@@ -10,7 +10,7 @@ namespace BandManager.Api.DAL.Context
 		public DbSet<Venue> Venues { get; set; }
 		public DbSet<Resources.Models.File> Files { get; set; }
 		public DbSet<Booking> Bookings { get; set; }
-		public DbSet<Band> Bands { get; set; }
+		public DbSet<Band> bands { get; set; }
 
 		private readonly string _connectionString;
 
