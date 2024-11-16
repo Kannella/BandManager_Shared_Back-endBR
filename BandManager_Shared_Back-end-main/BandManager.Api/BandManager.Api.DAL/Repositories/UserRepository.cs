@@ -6,7 +6,7 @@ namespace BandManager.Api.DAL.Repositories
 {
 	public class UserRepository : DirectDbRepository<User>, IUserRepository
 	{
-		public UserRepository(BandManagerContext context) : base(context)
+		public UserRepository(BandManagerContext context) : base (context)
 		{
 		}
 	}

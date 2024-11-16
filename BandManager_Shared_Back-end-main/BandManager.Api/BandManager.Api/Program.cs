@@ -1,63 +1,71 @@
-using BandManager.Api.DAL.Configuration;
-using MySql.Data.MySqlClient;
+using System.Reflection;
+using BandManager.Api.DAL.Context;
+using Microsoft.EntityFrameworkCore;
+using BandManager.Api.BLL.Services;
+using BandManager.Api.Resources.Interfaces.IRepositories;
+using BandManager.Api.Resources.Models;
+using BandManager.Api.DAL.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// Add CORS configuration
-builder.Services.AddCors(options =>
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
-    options.AddPolicy("AllowAllOrigins", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
+	c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+	{
+		Title = "BandManager.Api",
+		Version = "v1",
+		Description = "A simple API for managing bands and bookings",
+	});
+
+	var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+	c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
 });
 
-// Add configuration setup
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
 
-builder.Services.AddSingleton(configuration);
-builder.Services.AddSingleton<AppConfiguration>();
+
+
+//Gets the version of the database from appsettings.json this because XAMPP(the local test environment) uses a older version of MariaDB
+string dbVersion = builder.Configuration.GetValue<string>("DbVersions:Dev") ?? "10.11.8-mariadb";
+
+// Dependency injection
+builder.Services.AddDbContext<BandManagerContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DevConnection"),
+        new MySqlServerVersion(new Version(10, 11, 8)) // Insira a vers�o correta aqui
+    ));
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("ReactFrontEndDev", policyBuilder =>
+	{
+		policyBuilder.AllowAnyOrigin() //Cors is currently not working, mainly because the app sometimes runs on different ports, and we don't have auth in the backend yet. That's why we're opening this up for now
+			.AllowAnyHeader()
+			.AllowAnyMethod();
+	});
+});
+
+builder.Services.AddScoped<IDirectDbRepository<Availability>, DirectDbRepository<Availability>>();
+builder.Services.AddScoped<AvailabilityService>();
+
 
 var app = builder.Build();
-
-// Obter a string de conexão
-var appConfig = app.Services.GetRequiredService<AppConfiguration>();
-string connectionString = appConfig.GetConnectionString();
-
-using (var connection = new MySqlConnection(connectionString))
-{
-    try
-    {
-        connection.Open();
-        Console.WriteLine("Conexão bem-sucedida!");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Erro ao conectar: {ex.Message}");
-    }
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
+	app.UseCors("ReactFrontEndDev");
 }
 
 app.UseHttpsRedirection();
-app.UseDeveloperExceptionPage();
-
-// Enable CORS
-app.UseCors("AllowAllOrigins");
 
 app.UseAuthorization();
 

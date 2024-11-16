@@ -6,7 +6,7 @@ namespace BandManager.Api.DAL.Repositories
 {
 	public class VenueRepository : DirectDbRepository<Venue>, IVenueRepository
 	{
-		public VenueRepository(BandManagerContext context) : base(context)
+		public VenueRepository(BandManagerContext context) : base (context)
 		{
 		}
 	}

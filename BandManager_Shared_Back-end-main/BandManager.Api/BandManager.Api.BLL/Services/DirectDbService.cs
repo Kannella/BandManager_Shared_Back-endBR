@@ -1,9 +1,11 @@
 ﻿using BandManager.Api.Resources.Models;
 using BandManager.Api.Resources.Interfaces.IRepositories;
+using BandManager.Api.Resources.Interfaces;
+using BandManager.Api.Resources.Exceptions;
 
 namespace BandManager.Api.BLL.Services
 {
-    public class DirectDbService<E> where E : Entity
+    public class DirectDbService<E> : IDirectDbService<E> where E : Entity
     {
         private readonly IDirectDbRepository<E> _repository;
 
@@ -12,7 +14,7 @@ namespace BandManager.Api.BLL.Services
             _repository = repository;
         }
 
-        public void Create(E entity)
+        public virtual void Create(E entity)
         {
             _repository.Create(entity);
         }
@@ -22,24 +24,47 @@ namespace BandManager.Api.BLL.Services
             _repository.Delete(entity);
         }
 
-        public List<E> GetAll()
+        public List<E> GetAll(bool includeChildren = false)
         {
-            return _repository.GetAll();
+            List<E> entities = _repository.GetAll();
+
+			if (entities.Count <= 0 || entities == null)
+			{
+				throw new NoEntitiesFoundException("No entities found, Is the database table empty?");
+			}
+
+            return entities;
+		}
+
+        public E GetById(int id, bool includeChildren = true)
+        {
+            E entity = _repository.GetById(id);
+            
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"{typeof(E).Name} not found");
+            }
+            
+            return entity;
         }
 
-        public E GetById(int id)
+        public List<E> GetWhere(Func<E, bool> where, bool includeChildren = false)
         {
-            return _repository.GetById(id);
-        }
+			List<E> entities = _repository.GetWhere(where);
 
-        public List<E> GetWhere(Func<E, bool> where)
-        {
-            return _repository.GetWhere(where);
-        }
+			if (entities.Count <= 0 || entities == null)
+			{
+				throw new NoEntitiesFoundException("No entities found, No entities seem to match the search criteria");
+			}
+
+			return entities;
+		}
 
         public void Update(E entity)
         {
             _repository.Update(entity);
         }
+
+
     }
 }

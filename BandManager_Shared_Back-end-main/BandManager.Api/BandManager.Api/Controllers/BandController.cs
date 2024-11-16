@@ -1,24 +1,24 @@
-﻿using BandManager.Api.DAL.Repositories;
-using Microsoft.AspNetCore.Mvc;
-using BandManager.Api.DAL.Configuration;
+﻿using BandManager.Api.BLL.Services;
 using BandManager.Api.DAL.Context;
-using BandManager.Api.BLL.Services;
+using BandManager.Api.DAL.Repositories;
 using BandManager.Api.Resources.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BandManager.Api.Controllers
+
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BandController : ControllerBase
-    {
-        private readonly BandService _bandService;
+    public class BandController : DirectDbController<Band>
+	{
+		private readonly BandService _bandService;
 
-        public BandController(IConfiguration configuration) // Corrigido para BandController
+        public BandController(BandManagerContext context) : base(context)
         {
-            _bandService = new BandService(new BandRepository(new BandManagerContext(new AppConfiguration(configuration))));
+            _bandService = new BandService(new BandRepository(context));
         }
 
-        [HttpPost("Band")]
+        [HttpPost("CreateBand")]
         public IActionResult CreateBand([FromBody] Band band)
         {
             // Validação dos dados pode ser feita aqui, se necessário
@@ -29,4 +29,3 @@ namespace BandManager.Api.Controllers
         }
     }
 }
-

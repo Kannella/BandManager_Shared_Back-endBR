@@ -1,7 +1,6 @@
-namespace BandManager.Api.Resources.Models
+namespace BandManager.Api.Resources.Models;
+
+public class Entity
 {
-	public class Entity
-	{
-		public int Id { get; set; }
-	}
+    public int Id { get; set; }
 }

@@ -13,5 +13,7 @@ namespace BandManager.Api.BLL.Services
         {
             Create(band); // Chama o método da classe base para inserir o usuário
         }
+
+
     }
 }

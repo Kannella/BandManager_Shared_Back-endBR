@@ -29,19 +29,31 @@ namespace BandManager.Api.DAL.Repositories
 			_context.SaveChanges();
 		}
 
-		public List<E> GetAll()
+		public List<E> GetAll(bool includeChildren = false)
 		{
-			return _dbSet.ToList();
+			switch (includeChildren)
+			{
+				case true:
+					return _dbSet.ToList();
+				case false:
+					return _dbSet.IgnoreAutoIncludes().ToList();
+			}
 		}
 
-		public E GetById(int id)
+		public E GetById(int id, bool includeChildren = true)
 		{
-			return _dbSet.FirstOrDefault(e => e.Id == id);
+			return GetWhere(e => e.Id == id, includeChildren).FirstOrDefault();
 		}
 
-		public List<E> GetWhere(Func<E, bool> where)
+		public List<E> GetWhere(Func<E, bool> where, bool includeChildren = false)
 		{
-			return _dbSet.Where(where).ToList();
+			switch (includeChildren)
+			{
+				case true:
+					return _dbSet.Where(where).ToList();
+				case false:
+					return _dbSet.IgnoreAutoIncludes().Where(where).ToList();
+			}
 		}
 
 		public void Update(E entity)

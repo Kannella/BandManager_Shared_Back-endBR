@@ -6,7 +6,7 @@ namespace BandManager.Api.DAL.Repositories
 {
 	public class BookingRepository : DirectDbRepository<Booking>, IBookingRepository
 	{
-		public BookingRepository(BandManagerContext context) : base(context)
+		public BookingRepository(BandManagerContext context) : base (context)
 		{
 		}
 	}
