@@ -46,12 +46,9 @@ namespace BandManager.Api.Controllers
 				Console.WriteLine("Objeto convertido:");
 				Console.WriteLine($"Name: {booking.Name}, VenueId: {booking.VenueId}, BandId: {booking.BandId}");
 
-				_context.Bookings.Add(booking);
-				_context.SaveChanges();
+				_bookingService.Create(booking);
 
 				return Ok(booking);
-		}
-
 		}
 		
 		/// <summary>
