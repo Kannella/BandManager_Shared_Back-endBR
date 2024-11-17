@@ -9,14 +9,14 @@ namespace BandManager.Api.DAL.Context
         public BandManagerContext(DbContextOptions<BandManagerContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Venue> Venues { get; set; }
-        public DbSet<Resources.Models.File> Files { get; set; }
-        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Venue> venues { get; set; }
+        public DbSet<Resources.Models.File> files { get; set; }
+        public DbSet<Booking> bookings { get; set; }
         public DbSet<Band> bands { get; set; }
-        public DbSet<Agent> Agents { get; set; }
+        public DbSet<Agent> agents { get; set; }
         public DbSet<BandUser> band_user { get; set; }
-        public DbSet<BookingSong> BookingSongs { get; set; }
-        public DbSet<Song> Songs { get; set; }
+        public DbSet<BookingSong> set_song { get; set; }
+        public DbSet<Song> songs { get; set; }
 
         // Novo DbSet para a entidade Availability
         public DbSet<Availability> Availability { get; set; }

@@ -4,9 +4,10 @@ using BandManager.Api.Resources.Enums;
 namespace BandManager.Api.Resources.DTOs;
 
 public class BookingDTO
-{
-    [Required]
-    public string Name { get; set; } = string.Empty;
+{   
+
+
+    public string? Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     [Required]
     public int BandId { get; set; }
@@ -33,6 +34,8 @@ public class BookingDTO
 
     public Booking ToEntity()
     {
+        
+        Console.WriteLine($"VenueId: {VenueId}, Status: {Status}");
         return new Booking()
         {
             Name = this.Name,

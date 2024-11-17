@@ -1,57 +1,65 @@
-using BandManager.Api.BLL.Utilities;
 using BandManager.Api.Resources.Interfaces.IRepositories;
 using BandManager.Api.Resources.Models;
-using System;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 
 namespace BandManager.Api.BLL.Services
 {
-    public class BookingService : DirectDbService<Booking>
-    {
-        private readonly IBookingRepository _bookingRepository;
+	public class BookingService : DirectDbService<Booking>
+	{
+		private readonly IBookingRepository _bookingRepository;
+		private readonly IBandRepository _bandRepository;
+		private readonly IAgentRepository _agentRepository;
+		private readonly IVenueRepository _venueRepository;
+		public BookingService(IBookingRepository bookingRepository, IBandRepository bandRepository, IAgentRepository agentRepository, IVenueRepository venueRepository) : base(bookingRepository) //Unsure wether I should use Idirectdb or the acutal interface
+		{
+			_bookingRepository = bookingRepository;
+			_bandRepository = bandRepository;
+			_agentRepository = agentRepository;
+			_venueRepository = venueRepository;
+		}
 
-        public BookingService(IBookingRepository bookingRepository) : base(bookingRepository)
-        {
-            _bookingRepository = bookingRepository;
-        }
+		public override void Create(Booking booking)
+		{
+			//Validate whether the keys we are trying to link exist
+			_bandRepository.GetById(booking.BandId);
+			
+			if (booking.AgentId != null)
+			{
+				_agentRepository.GetById((int)booking.AgentId);
+			}
 
-        public void ShareOnFacebook(int bookingId)
-        {
-            var booking = _bookingRepository.GetById(bookingId);
-            if (booking == null)
-            {
-                throw new KeyNotFoundException("Evento não encontrado.");
-            }
+			if (booking.VenueId != null)
+			{
+				_venueRepository.GetById((int)booking.VenueId);
+			}
+			
+			_bookingRepository.Create(booking);
+		}
+		
+		public void SetIsPublicEvent(int bookingId, bool isPublicEvent)
+		{
+			Booking booking = _bookingRepository.GetById(bookingId);
+			if (booking == null)
+			{
+				throw new KeyNotFoundException("Booking not found");
+			}
+			
+			booking.IsPublicEvent = isPublicEvent;
+			_bookingRepository.Update(booking);
+		}
 
-            // Acessando os dados do Booking para o post
-            string title = booking.Name ?? "Event";
-            string date = booking.ShowStartTime?.ToString("dd/MM/yyyy HH:mm") ?? "Date not specified";
-            string location = booking.Venue != null ? booking.Venue.Address : "Location not specified";
-            string description = booking.Description ?? "No description available";
+		public void ValidateForeignKeys(Booking booking)
+		{
+			_bandRepository.GetById(booking.BandId);
+			
+			if (booking.AgentId != null)
+			{
+				_agentRepository.GetById((int)booking.AgentId);
+			}
 
-            // Definir o token de acesso e a URL da API do Facebook
-            string accessToken = "EAARFbXMNqhwBO4v8GrRMes3aYqtaXYMcZAHqfypKZAfNbdMA7EzoFXw2xVF2syuXdMGfwpGjvEZCxnO9ZB6wCtah7uB3eWnAhKnBTfE9pUZBROlqSTOmlMyfdUA5lMLm2wDK5E9FEOC6nA6s7nKilgH0MAvnLf4HquFS3ZCe3ZCZCzMY3N55z8gtYVfiKyGy1qmlOyM28W0Ybs7LfE9nYAZDZD";
-            string pageId = "1202236290869788";
-            string url = $"https://graph.facebook.com/{pageId}/feed?access_token={accessToken}";
-
-            // Criar o conteúdo do post com base nos dados do evento
-            var postContent = new
-            {
-                message = $"Confira nosso evento: {title}\nData: {date}\nLocal: {location}\nDescrição: {description}"
-            };
-
-            using var client = new HttpClient();
-            var content = new StringContent(JsonSerializer.Serialize(postContent), Encoding.UTF8, "application/json");
-
-            // Enviar a requisição POST para o Facebook
-            var response = client.PostAsync(url, content).Result;
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception("Erro ao compartilhar o evento no Facebook: " + response.ReasonPhrase);
-            }
-        }
-    }
+			if (booking.VenueId != null)
+			{
+				_venueRepository.GetById((int)booking.VenueId);
+			}
+		}
+	}
 }

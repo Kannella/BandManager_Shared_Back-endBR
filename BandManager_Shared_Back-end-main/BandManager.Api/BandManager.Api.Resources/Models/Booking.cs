@@ -4,9 +4,10 @@ namespace BandManager.Api.Resources.Models;
 
 public class Booking : Entity
 {
+
     public int BandId { get; set; }
     
-    public string Name { get; set; }
+    public string? Name { get; set; }
     
     public string? Description { get; set; }
     
@@ -59,7 +60,6 @@ public class Booking : Entity
     public bool IsPublicEvent { get; set; }
 
     public List<File> Files { get; set; }
-
 
     public List<BookingSong> BookingSong { get; set; }
 }
