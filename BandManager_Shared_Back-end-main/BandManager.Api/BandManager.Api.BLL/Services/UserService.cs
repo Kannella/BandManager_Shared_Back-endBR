@@ -10,10 +10,10 @@ namespace BandManager.Api.BLL.Services
 		{
 		}
 
-    public User GetByUsername(string username)
+    public User GetByEmail(string Email)
     {
         // Usando a classe base para obter o repositório
-        return GetAll().FirstOrDefault(u => u.Name == username);
+        return GetAll().FirstOrDefault(u => u.Email == Email);
     }
     
 

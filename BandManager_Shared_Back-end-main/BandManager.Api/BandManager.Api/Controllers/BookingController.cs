@@ -13,9 +13,11 @@ namespace BandManager.Api.Controllers
 	public class BookingController : DirectDbController<Booking>
 	{
 		private readonly BookingService _bookingService;
+		private readonly BandManagerContext _context;
 
 		public BookingController(BandManagerContext context) : base(context)
 		{
+			_context = context;
 			_bookingService = new BookingService(new BookingRepository(context), new BandRepository(context), new AgentRepository(context), new VenueRepository(context));
 		}
 
@@ -131,5 +133,32 @@ namespace BandManager.Api.Controllers
 				return Problem();
 			}
 		}
+
+		[HttpGet("GetBookingsForUser")]
+		public IActionResult GetBookingsForUser([FromQuery] int userId)
+		{
+				try
+				{
+						// Passo 1: Obter a lista de BandIds associadas ao usuário
+						var userBands = _context.Set<BandUser>()
+																		.Where(bu => bu.UserId == userId)
+																		.Select(bu => bu.BandId)
+																		.ToList();
+
+						// Passo 2: Filtrar os bookings com base no BandId do usuário
+						var bookings = _context.Set<Booking>()
+																		.Where(b => userBands.Contains(b.BandId))
+																		.ToList();
+
+						// Retornar os bookings filtrados
+						return Ok(bookings);
+				}
+			catch (Exception ex)
+			{
+					return Problem(detail: ex.Message); // Passa a mensagem da exceção como uma string
+			}
+		}
+
+
 	}
 }

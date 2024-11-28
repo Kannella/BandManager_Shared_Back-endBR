@@ -40,29 +40,30 @@ namespace BandManager.Api.Controllers
 				[HttpPost("Login")]
 				public IActionResult Login([FromBody] LoginRequest loginRequest)
 				{
-						if (string.IsNullOrWhiteSpace(loginRequest.Username) || string.IsNullOrWhiteSpace(loginRequest.Password))
+						if (string.IsNullOrWhiteSpace(loginRequest.Email) || string.IsNullOrWhiteSpace(loginRequest.Password))
 						{
-								return BadRequest("Username and password are required.");
+								return BadRequest("Email and password are required.");
 						}
 
 						try
 						{
-								var user = _userService.GetByUsername(loginRequest.Username);
+								var user = _userService.GetByEmail(loginRequest.Email);
 
 								if (user == null)
 								{
-										return Unauthorized("Invalid username or password.");
+										return Unauthorized("Invalid Email or password.");
 								}
 
 								bool isPasswordValid = PasswordHasher.VerifyPassword(loginRequest.Password, user.Password);
 
 								if (isPasswordValid)
 								{
-										return Ok("Login successful.");
+										// Retorna o ID do usuário junto com a mensagem de sucesso
+										return Ok(new { message = "Login successful.", userId = user.Id, Role = user.Role });
 								}
 								else
 								{
-										return Unauthorized("Invalid username or password.");
+										return Unauthorized("Invalid Email or password.");
 								}
 						}
 						catch (Exception ex)
