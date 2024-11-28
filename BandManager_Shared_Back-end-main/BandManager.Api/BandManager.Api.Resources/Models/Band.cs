@@ -3,6 +3,6 @@ namespace BandManager.Api.Resources.Models;
 public class Band : Entity
 {
     public string Name { get; set; } = null!;
-    public List<BandUser>? BandUsers { get; set; }
-    public List<Booking>? Bookings { get; set; }
+    public string? BandUsers { get; set; }
+    public string? Bookings { get; set; }
 }

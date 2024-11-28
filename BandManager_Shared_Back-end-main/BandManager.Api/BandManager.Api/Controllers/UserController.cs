@@ -3,6 +3,7 @@ using BandManager.Api.DAL.Context;
 using BandManager.Api.DAL.Repositories;
 using BandManager.Api.Resources.Models;
 using Microsoft.AspNetCore.Mvc;
+using BandManager.Api.BLL.Utilities;
 
 namespace BandManager.Api.Controllers
 {
@@ -18,13 +19,56 @@ namespace BandManager.Api.Controllers
 		}
 
         [HttpPost("CreateUser")]
-        public IActionResult CreateUser([FromBody] User user)
-        {
-            // Validação dos dados pode ser feita aqui, se necessário
+				public IActionResult CreateUser([FromBody] User user)
+				{
+						if (string.IsNullOrWhiteSpace(user.Name) || string.IsNullOrWhiteSpace(user.Password))
+						{
+								return BadRequest("Username and password are required.");
+						}
 
-            _userService.CreateUser(user);
+						try
+						{
+								_userService.CreateUser(user);
+								return Ok("User created successfully.");
+						}
+						catch (Exception ex)
+						{
+								return StatusCode(500, $"Internal server error: {ex.Message}");
+						}
+				}
 
-            return Ok("Usuário criado com sucesso!"); // Retorna 200 ao final do cadastro
-        }
+				[HttpPost("Login")]
+				public IActionResult Login([FromBody] LoginRequest loginRequest)
+				{
+						if (string.IsNullOrWhiteSpace(loginRequest.Username) || string.IsNullOrWhiteSpace(loginRequest.Password))
+						{
+								return BadRequest("Username and password are required.");
+						}
+
+						try
+						{
+								var user = _userService.GetByUsername(loginRequest.Username);
+
+								if (user == null)
+								{
+										return Unauthorized("Invalid username or password.");
+								}
+
+								bool isPasswordValid = PasswordHasher.VerifyPassword(loginRequest.Password, user.Password);
+
+								if (isPasswordValid)
+								{
+										return Ok("Login successful.");
+								}
+								else
+								{
+										return Unauthorized("Invalid username or password.");
+								}
+						}
+						catch (Exception ex)
+						{
+								return StatusCode(500, $"Internal server error: {ex.Message}");
+						}
+				}
     }
 }

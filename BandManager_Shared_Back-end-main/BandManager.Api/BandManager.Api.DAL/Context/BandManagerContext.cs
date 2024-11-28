@@ -27,14 +27,6 @@ namespace BandManager.Api.DAL.Context
             modelBuilder.Entity<Agent>()
                 .Navigation(a => a.Bookings)
                 .AutoInclude();
-
-            modelBuilder.Entity<Band>()
-                .Navigation(b => b.BandUsers)
-                .AutoInclude();
-            modelBuilder.Entity<Band>()
-                .Navigation(b => b.Bookings)
-                .AutoInclude();
-
             modelBuilder.Entity<Booking>()
                 .Navigation(b => b.Files)
                 .AutoInclude();
