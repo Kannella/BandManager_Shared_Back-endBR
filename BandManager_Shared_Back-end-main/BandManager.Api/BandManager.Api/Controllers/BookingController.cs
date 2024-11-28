@@ -159,6 +159,38 @@ namespace BandManager.Api.Controllers
 			}
 		}
 
+		[HttpGet("GetBandsForUser")]
+		public IActionResult GetBandsForUser([FromQuery] int userId)
+		{
+				try
+				{
+						// Obter as bandas que o usuário participa
+						var bands = _context.Set<BandUser>()
+																.Where(bu => bu.UserId == userId)
+																.Join(
+																		_context.Set<Band>(),
+																		bu => bu.BandId,
+																		b => b.Id,
+																		(bu, b) => new 
+																		{
+																				b.Name,
+																		}
+																)
+																.ToList();
+
+						if (!bands.Any())
+						{
+								return NotFound($"No bands found for user with ID {userId}");
+						}
+
+						return Ok(bands);
+				}
+				catch (Exception ex)
+				{
+						return Problem("An error occurred while retrieving bands for the user", ex.ToString());
+				}
+		}
+
 
 	}
 }
