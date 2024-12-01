@@ -173,7 +173,8 @@ namespace BandManager.Api.Controllers
 																		b => b.Id,
 																		(bu, b) => new 
 																		{
-																				b.Name,
+																				b.Id,    // ID da banda
+																				b.Name   // Nome da banda
 																		}
 																)
 																.ToList();
@@ -183,6 +184,7 @@ namespace BandManager.Api.Controllers
 								return NotFound($"No bands found for user with ID {userId}");
 						}
 
+						// Retornar as bandas com ID e nome
 						return Ok(bands);
 				}
 				catch (Exception ex)
@@ -190,6 +192,7 @@ namespace BandManager.Api.Controllers
 						return Problem("An error occurred while retrieving bands for the user", ex.ToString());
 				}
 		}
+
 
 
 	}
