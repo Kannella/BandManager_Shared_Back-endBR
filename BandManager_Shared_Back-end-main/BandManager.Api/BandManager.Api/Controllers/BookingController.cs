@@ -193,6 +193,25 @@ namespace BandManager.Api.Controllers
 				}
 		}
 
+		[HttpDelete("{id:int}")]
+		public IActionResult RemoveBooking(int id)
+		{
+				try
+				{
+						// Usa o método genérico herdado do DirectDbController
+						return base.Delete(id);
+				}
+				catch (KeyNotFoundException ex)
+				{
+						return NotFound(ex.Message);
+				}
+				catch (Exception ex)
+				{
+						return Problem(detail: ex.Message);
+				}
+		}
+
+
 
 
 	}
